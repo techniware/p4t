@@ -1,0 +1,325 @@
+include(ExternalProject)
+
+# CorrectWindowsPaths - this module defines one macro
+#
+# CONVERT_CYGWIN_PATH( PATH )
+#  This uses the command cygpath (provided by cygwin) to convert
+#  unix-style paths into paths useable by cmake on windows
+
+macro (CONVERT_CYGWIN_PATH _path)
+  if (WIN32)
+    EXECUTE_PROCESS(COMMAND cygpath.exe -m ${${_path}}
+      OUTPUT_VARIABLE ${_path})
+    string (STRIP ${${_path}} ${_path})
+  endif (WIN32)
+endmacro (CONVERT_CYGWIN_PATH)
+
+macro(to_windows_path CMakePath ResultingPath)
+  string(REGEX REPLACE "/" "\\\\" ${ResultingPath} "${CMakePath}")
+endmacro()
+
+# Builds external third party projects.
+# The parent script needs to define the "GLOBAL_OUTPUT_PATH" variable,
+# which will be used as output directory for all *.lib, *.dll, *.a, *.so, *.pdb files.
+
+###############################################################################
+# CppMicroServices
+###############################################################################
+ExternalProject_Add( CppMicroServices
+
+  GIT_REPOSITORY "https://github.com/techniware/CppMicroServices.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/CppMicroServices"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH}
+              -DUS_BUILD_SHARED_LIBS=true          # The library should be build shared 
+              -DUS_BUILD_TESTING=true              # Build unit tests and code snippets.
+              -DUS_ENABLE_AUTOLOADING_SUPPORT=true # Enable auto-loading of modules located in special sub-directories. 
+              -DUS_ENABLE_THREADING_SUPPORT=true   # Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) 
+)
+
+###############################################################################
+# FMT
+###############################################################################
+ExternalProject_Add( FMT
+
+  GIT_REPOSITORY "https://github.com/techniware/fmt.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/fmt"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+              -DFMT_PEDANTIC=ON
+              -DFMT_DOC=ON
+              -DFMT_INSTALL=ON
+              -DFMT_TEST=ON
+              -DFMT_USE_CPP11=ON
+)
+ 
+###############################################################################
+# spdlog
+###############################################################################
+ExternalProject_Add( spdlog
+  DEPENDS FMT
+  
+  GIT_REPOSITORY "https://github.com/techniware/spdlog.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/spdlog"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH}
+              -DSPDLOG_BUILD_EXAMPLES=ON
+              -DSPDLOG_BUILD_TESTS=ON
+              -DSPDLOG_FMT_EXTERNAL=1
+)
+  
+###############################################################################
+# units
+###############################################################################
+ExternalProject_Add( units
+  
+  GIT_REPOSITORY "https://github.com/techniware/units.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/units"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH}
+              -DBUILD_TESTS=ON
+              -DBUILD_DOCS=OFF
+)
+  
+###############################################################################
+# eastl
+###############################################################################
+ExternalProject_Add( eastl
+
+  GIT_REPOSITORY "https://github.com/techniware/EASTL.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/eastl"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+              -DEASTL_BUILD_TESTS=ON
+              -DEASTL_BUILD_BENCHMARK=ON
+)
+
+###############################################################################
+# nanomsg
+###############################################################################
+ExternalProject_Add( nanomsg
+
+  GIT_REPOSITORY "https://github.com/techniware/nanomsg.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/nanomsg"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+) 
+           
+###############################################################################
+# muparser
+###############################################################################
+ExternalProject_Add( muparserx
+
+  GIT_REPOSITORY "https://github.com/techniware/muparserx.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/muparser"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+)
+
+###############################################################################
+# rapidjson
+###############################################################################
+ExternalProject_Add( rapidjson
+
+  GIT_REPOSITORY "https://github.com/techniware/rapidjson.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/rapidjson"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+              -DRAPIDJSON_BUILD_THIRDPARTY_GTEST=OFF
+              -DRAPIDJSON_BUILD_DOC=OFF
+              -DRAPIDJSON_BUILD_EXAMPLES=OFF
+              -DRAPIDJSON_BUILD_EXAMPLES=OFF
+  )
+
+###############################################################################
+# lua
+###############################################################################
+ExternalProject_Add( lua
+
+  GIT_REPOSITORY "https://github.com/techniware/lua.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/lua"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+)
+
+###############################################################################
+# kanguru
+###############################################################################
+ExternalProject_Add( kanguru
+
+  GIT_REPOSITORY "https://github.com/techniware/kangaru.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/kanguru"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+)
+
+###############################################################################
+# CommandQueue
+###############################################################################
+ExternalProject_Add( CommandQueue
+
+  GIT_REPOSITORY "https://github.com/techniware/CommandQueue.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CONFIGURE_COMMAND ""
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/CommandQueue"
+  BUILD_COMMAND ""  
+  INSTALL_COMMAND "" 
+)
+install(
+    FILES ${CMAKE_BINARY_DIR}/3rdparty/CommandQueue/CommandQueue.hpp
+    DESTINATION ${GLOBAL_OUTPUT_PATH}/include/cq
+)
+
+###############################################################################
+# Date
+###############################################################################
+ExternalProject_Add( date
+
+  GIT_REPOSITORY "https://github.com/techniware/date.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CONFIGURE_COMMAND ""
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/date"
+  BUILD_COMMAND ""  
+  INSTALL_COMMAND "" 
+)
+
+install(
+    FILES  ${CMAKE_BINARY_DIR}/3rdparty/date/*.h
+    DESTINATION ${GLOBAL_OUTPUT_PATH}/include/date
+)
+
+###############################################################################
+# BOOST
+###############################################################################
+set( Boost_Bootstrap_Command )
+if( UNIX )
+  set( Boost_Bootstrap_Command ./bootstrap.sh )
+  set( Boost_b2_Command ./b2 )
+else()
+  if( WIN32 )
+    set( Boost_Bootstrap_Command bootstrap.bat )
+    set( Boost_b2_Command b2.exe )
+  endif()
+endif()
+
+ExternalProject_Add(boost
+  GIT_REPOSITORY "https://github.com/boostorg/boost.git"
+  GIT_TAG "boost-1.62.0"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/boost"
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CONFIGURE_COMMAND ${Boost_Bootstrap_Command}
+  BUILD_COMMAND  ${Boost_b2_Command} install
+    --without-python
+    --without-mpi
+    --disable-icu
+    --prefix=${GLOBAL_OUTPUT_PATH}
+    --threading=single,multi
+    --link=shared,static
+    --variant=release,debug
+    -j8
+  BUILD_IN_SOURCE 1
+  INSTALL_COMMAND ""
+)
+
+###############################################################################
+# boost_application
+###############################################################################
+ExternalProject_Add( boost_application
+  DEPENDS boost
+
+  GIT_REPOSITORY "https://github.com/techniware/Boost.Application.git"
+  GIT_TAG "master"
+  
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CONFIGURE_COMMAND ""
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/boost_application"
+  BUILD_COMMAND ""  
+  INSTALL_COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_BINARY_DIR}/3rdparty/boost_application/include/boost" "${GLOBAL_OUTPUT_PATH}/include/boost-1_62/boost" 
+)
+
+
+###############################################################################
+# Poco C++ library
+###############################################################################
+ExternalProject_Add( poco
+
+  GIT_REPOSITORY "https://github.com/techniware/poco.git"
+  GIT_TAG "poco-1.8.0"
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/poco"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+              -DENABLE_DATA_MYSQL=OFF
+) 
+
+
+###############################################################################
+# flatbuffers
+###############################################################################
+ExternalProject_Add( flatbuffers
+
+  GIT_REPOSITORY "https://github.com/techniware/flatbuffers.git"
+  GIT_TAG "v1.4.0"
+  PATCH_COMMAND ""
+  
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/3rdparty/flatbuffers"
+  CMAKE_ARGS  -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH} 
+) 
+
+
+
+if( NOT WIN32 )
+  set(P4T_FRAMEWORK_LIBRARY_DIR ${GLOBAL_OUTPUT_PATH}/lib/ )
+  set(P4T_FRAMEWORK_INCLUDE_DIR ${GLOBAL_OUTPUT_PATH}/include/ ${GLOBAL_OUTPUT_PATH}/include/boost-1_62)
+else()
+  set(P4T_FRAMEWORK_LIBRARY_DIR ${GLOBAL_OUTPUT_PATH}/lib/ )
+  set(P4T_FRAMEWORK_INCLUDE_DIR ${GLOBAL_OUTPUT_PATH}/include/ ${GLOBAL_OUTPUT_PATH}/include/boost-1_62)
+endif()
